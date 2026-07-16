@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formula 1 World — Standings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0b0f;
+    --surface: #16161c;
+    --surface-2: #1e1e26;
+    --line: #2a2a34;
+    --red: #e10600;
+    --yellow: #ffd400;
+    --white: #f5f5f7;
+    --grey: #9497a1;
+    --gold: #d4af37;
+    --silver: #c7c9cf;
+    --bronze: #b0703c;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+
+  h1, h2, .display{
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  a{ color: var(--yellow); }
+  a:focus-visible{ outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+  .stripe{
+    height: 6px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--red), var(--red) 18px,
+      var(--yellow) 18px, var(--yellow) 24px
+    );
+  }
+
+  header{
+    text-align: center;
+    padding: 70px 20px 40px;
+    background: radial-gradient(circle at 50% -20%, #22131199, transparent 60%), var(--bg);
+  }
+
+  .eyebrow{
+    font-family: 'Space Mono', monospace;
+    color: var(--red);
+    letter-spacing: 0.35em;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  h1.title{
+    font-size: clamp(2.2rem, 7vw, 4.2rem);
+    font-style: italic;
+    transform: skewX(-4deg);
+    line-height: 0.95;
+  }
+  h1.title span{ color: var(--red); }
+
+  .tagline{
+    font-family: 'Space Mono', monospace;
+    color: var(--grey);
+    font-size: 0.95rem;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  nav{
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-top: 26px;
+  }
+  nav a{
+    color: var(--white);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+  }
+  nav a:hover{ color: var(--yellow); border-color: var(--red); }
+  nav a.active{ border-color: var(--red); color: var(--yellow); }
+
+  main{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 60px 24px 90px;
+  }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  .section-head .num{
+    font-family: 'Space Mono', monospace;
+    color: var(--red);
+    font-size: 0.9rem;
+  }
+  h2{ font-size: clamp(1.5rem, 3.5vw, 2rem); font-style: italic; }
+  .section-sub{
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    margin-top: -18px;
+    margin-bottom: 30px;
+  }
+
+  /* ---------- Tables ---------- */
+  .table-wrap{
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    min-width: 620px;
+  }
+  th, td{
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  thead th{
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+  }
+  tbody tr:nth-child(even){ background: var(--surface-2); }
+  tbody tr:hover{ background: #26161a; }
+
+  .pos{
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    width: 46px;
+  }
+  .pos-badge{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    font-size: 0.8rem;
+  }
+  tr[data-pos="1"] .pos-badge{ border-color: var(--gold); color: var(--gold); }
+  tr[data-pos="2"] .pos-badge{ border-color: var(--silver); color: var(--silver); }
+  tr[data-pos="3"] .pos-badge{ border-color: var(--bronze); color: var(--bronze); }
+
+  .driver-name{ font-weight: 600; color: var(--white); }
+  .flag{ margin-right: 6px; }
+  .nat{ color: var(--grey); font-family: 'Space Mono', monospace; font-size: 0.78rem; }
+
+  .team-cell{ display: flex; align-items: center; gap: 10px; }
+  .swatch{ width: 10px; height: 10px; flex: none; }
+
+  .pts{
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    color: var(--yellow);
+    text-align: right;
+  }
+
+  /* team bar viz */
+  .team-row td.team-cell-wrap{ min-width: 220px; }
+  .bar-track{
+    position: relative;
+    height: 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    min-width: 140px;
+  }
+  .bar-fill{
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--red);
+  }
+  .bar-label{
+    position: relative;
+    z-index: 1;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--white);
+    padding-left: 8px;
+    line-height: 22px;
+    mix-blend-mode: difference;
+  }
+
+  /* Row highlight for 0-point teams/drivers */
+  tr.zero td{ color: var(--grey); }
+  tr.zero .pts{ color: var(--grey); }
+
+  footer{
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+  }
+  footer a{ display: inline-block; margin-top: 10px; }
+
+  @media (max-width: 700px){
+    main{ padding: 40px 18px 70px; }
+    .bar-track{ min-width: 90px; }
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="stripe"></div>
+
+  <header id="top">
+    <span class="eyebrow">GRAND PRIX EDITION</span>
+    <h1 class="title">SEASON <span>STANDINGS</span></h1>
+    <p class="tagline">— WHO LEADS THE CHAMPIONSHIP —</p>
+    <nav>
+      <a href="formula1-world.html">Home</a>
+      <a href="table.html">Standings</a>
+      <a href="image.html">Gallery</a>
+    </nav>
+  </header>
+
+  <hr style="border: none; border-top: 1px solid var(--line);">
+
+  <main>
+
+    <!-- Drivers' Championship -->
+    <section id="drivers-standings">
+      <div class="section-head">
+        <span class="num">01</span>
+        <h2>Drivers' Championship</h2>
+      </div>
+      <p class="section-sub">POINTS AFTER THE LATEST ROUND</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="pos">Pos.</th>
+              <th>Driver</th>
+              <th>Team</th>
+              <th style="text-align:right;">Pts.</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr data-pos="1">
+              <td class="pos"><span class="pos-badge">1</span></td>
+              <td><span class="flag">🇮🇹</span><span class="driver-name">Kimi Antonelli</span> <span class="nat">ITA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#27F4D2;"></span>Mercedes</div></td>
+              <td class="pts">179</td>
+            </tr>
+
+            <tr data-pos="2">
+              <td class="pos"><span class="pos-badge">2</span></td>
+              <td><span class="flag">🇬🇧</span><span class="driver-name">George Russell</span> <span class="nat">GBR</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#27F4D2;"></span>Mercedes</div></td>
+              <td class="pts">154</td>
+            </tr>
+
+            <tr data-pos="3">
+              <td class="pos"><span class="pos-badge">3</span></td>
+              <td><span class="flag">🇬🇧</span><span class="driver-name">Lewis Hamilton</span> <span class="nat">GBR</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#E8002D;"></span>Ferrari</div></td>
+              <td class="pts">147</td>
+            </tr>
+
+            <tr data-pos="4">
+              <td class="pos"><span class="pos-badge">4</span></td>
+              <td><span class="flag">🇲🇨</span><span class="driver-name">Charles Leclerc</span> <span class="nat">MON</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#E8002D;"></span>Ferrari</div></td>
+              <td class="pts">108</td>
+            </tr>
+
+            <tr data-pos="5">
+              <td class="pos"><span class="pos-badge">5</span></td>
+              <td><span class="flag">🇬🇧</span><span class="driver-name">Lando Norris</span> <span class="nat">GBR</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#FF8000;"></span>McLaren</div></td>
+              <td class="pts">97</td>
+            </tr>
+
+            <tr data-pos="6">
+              <td class="pos"><span class="pos-badge">6</span></td>
+              <td><span class="flag">🇦🇺</span><span class="driver-name">Oscar Piastri</span> <span class="nat">AUS</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#FF8000;"></span>McLaren</div></td>
+              <td class="pts">82</td>
+            </tr>
+
+            <tr data-pos="7">
+              <td class="pos"><span class="pos-badge">7</span></td>
+              <td><span class="flag">🇳🇱</span><span class="driver-name">Max Verstappen</span> <span class="nat">NED</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#3671C6;"></span>Red Bull Racing</div></td>
+              <td class="pts">76</td>
+            </tr>
+
+            <tr data-pos="8">
+              <td class="pos"><span class="pos-badge">8</span></td>
+              <td><span class="flag">🇫🇷</span><span class="driver-name">Isack Hadjar</span> <span class="nat">FRA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#3671C6;"></span>Red Bull Racing</div></td>
+              <td class="pts">52</td>
+            </tr>
+
+            <tr data-pos="9">
+              <td class="pos"><span class="pos-badge">9</span></td>
+              <td><span class="flag">🇫🇷</span><span class="driver-name">Pierre Gasly</span> <span class="nat">FRA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#0090FF;"></span>Alpine</div></td>
+              <td class="pts">42</td>
+            </tr>
+
+            <tr data-pos="10">
+              <td class="pos"><span class="pos-badge">10</span></td>
+              <td><span class="flag">🇳🇿</span><span class="driver-name">Liam Lawson</span> <span class="nat">NZL</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#6C98FF;"></span>Racing Bulls</div></td>
+              <td class="pts">39</td>
+            </tr>
+
+            <tr data-pos="11">
+              <td class="pos"><span class="pos-badge">11</span></td>
+              <td><span class="flag">🇬🇧</span><span class="driver-name">Arvid Lindblad</span> <span class="nat">GBR</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#6C98FF;"></span>Racing Bulls</div></td>
+              <td class="pts">20</td>
+            </tr>
+
+            <tr data-pos="12">
+              <td class="pos"><span class="pos-badge">12</span></td>
+              <td><span class="flag">🇬🇧</span><span class="driver-name">Oliver Bearman</span> <span class="nat">GBR</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#B6BABD;"></span>Haas F1 Team</div></td>
+              <td class="pts">18</td>
+            </tr>
+
+            <tr data-pos="13">
+              <td class="pos"><span class="pos-badge">13</span></td>
+              <td><span class="flag">🇦🇷</span><span class="driver-name">Franco Colapinto</span> <span class="nat">ARG</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#0090FF;"></span>Alpine</div></td>
+              <td class="pts">18</td>
+            </tr>
+
+            <tr data-pos="14">
+              <td class="pos"><span class="pos-badge">14</span></td>
+              <td><span class="flag">🇧🇷</span><span class="driver-name">Gabriel Bortoleto</span> <span class="nat">BRA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#BB0A30;"></span>Audi</div></td>
+              <td class="pts">6</td>
+            </tr>
+
+            <tr data-pos="15">
+              <td class="pos"><span class="pos-badge">15</span></td>
+              <td><span class="flag">🇪🇸</span><span class="driver-name">Carlos Sainz</span> <span class="nat">ESP</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#64C4FF;"></span>Williams</div></td>
+              <td class="pts">6</td>
+            </tr>
+
+            <tr data-pos="16">
+              <td class="pos"><span class="pos-badge">16</span></td>
+              <td><span class="flag">🇹🇭</span><span class="driver-name">Alexander Albon</span> <span class="nat">THA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#64C4FF;"></span>Williams</div></td>
+              <td class="pts">5</td>
+            </tr>
+
+            <tr data-pos="17">
+              <td class="pos"><span class="pos-badge">17</span></td>
+              <td><span class="flag">🇫🇷</span><span class="driver-name">Esteban Ocon</span> <span class="nat">FRA</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#B6BABD;"></span>Haas F1 Team</div></td>
+              <td class="pts">3</td>
+            </tr>
+
+            <tr data-pos="18">
+              <td class="pos"><span class="pos-badge">18</span></td>
+              <td><span class="flag">🇪🇸</span><span class="driver-name">Fernando Alonso</span> <span class="nat">ESP</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#229971;"></span>Aston Martin</div></td>
+              <td class="pts">1</td>
+            </tr>
+
+            <tr data-pos="19" class="zero">
+              <td class="pos"><span class="pos-badge">19</span></td>
+              <td><span class="flag">🇩🇪</span><span class="driver-name">Nico Hulkenberg</span> <span class="nat">GER</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#BB0A30;"></span>Audi</div></td>
+              <td class="pts">0</td>
+            </tr>
+
+            <tr data-pos="20" class="zero">
+              <td class="pos"><span class="pos-badge">20</span></td>
+              <td><span class="flag">🇫🇮</span><span class="driver-name">Valtteri Bottas</span> <span class="nat">FIN</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#FFD100;"></span>Cadillac</div></td>
+              <td class="pts">0</td>
+            </tr>
+
+            <tr data-pos="21" class="zero">
+              <td class="pos"><span class="pos-badge">21</span></td>
+              <td><span class="flag">🇲🇽</span><span class="driver-name">Sergio Perez</span> <span class="nat">MEX</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#FFD100;"></span>Cadillac</div></td>
+              <td class="pts">0</td>
+            </tr>
+
+            <tr data-pos="22" class="zero">
+              <td class="pos"><span class="pos-badge">22</span></td>
+              <td><span class="flag">🇨🇦</span><span class="driver-name">Lance Stroll</span> <span class="nat">CAN</span></td>
+              <td><div class="team-cell"><span class="swatch" style="background:#229971;"></span>Aston Martin</div></td>
+              <td class="pts">0</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr style="border: none; border-top: 1px solid var(--line); margin: 70px 0;">
+
+    <!-- Constructors' Championship -->
+    <section id="team-standings">
+      <div class="section-head">
+        <span class="num">02</span>
+        <h2>Constructors' Championship</h2>
+      </div>
+      <p class="section-sub">POINTS SHARE RELATIVE TO THE LEADER</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="pos">Pos.</th>
+              <th>Team</th>
+              <th>Points Share</th>
+              <th style="text-align:right;">Pts.</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr data-pos="1">
+              <td class="pos"><span class="pos-badge">1</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#27F4D2;"></span>Mercedes</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:100%; background:#27F4D2;"></div><div class="bar-label">333</div></div></td>
+              <td class="pts">333</td>
+            </tr>
+
+            <tr data-pos="2">
+              <td class="pos"><span class="pos-badge">2</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#E8002D;"></span>Ferrari</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:76.6%; background:#E8002D;"></div><div class="bar-label">255</div></div></td>
+              <td class="pts">255</td>
+            </tr>
+
+            <tr data-pos="3">
+              <td class="pos"><span class="pos-badge">3</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#FF8000;"></span>McLaren</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:53.8%; background:#FF8000;"></div><div class="bar-label">179</div></div></td>
+              <td class="pts">179</td>
+            </tr>
+
+            <tr data-pos="4">
+              <td class="pos"><span class="pos-badge">4</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#3671C6;"></span>Red Bull Racing</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:38.4%; background:#3671C6;"></div><div class="bar-label">128</div></div></td>
+              <td class="pts">128</td>
+            </tr>
+
+            <tr data-pos="5">
+              <td class="pos"><span class="pos-badge">5</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#0090FF;"></span>Alpine</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:18%; background:#0090FF;"></div><div class="bar-label">60</div></div></td>
+              <td class="pts">60</td>
+            </tr>
+
+            <tr data-pos="6">
+              <td class="pos"><span class="pos-badge">6</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#6C98FF;"></span>Racing Bulls</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:17.7%; background:#6C98FF;"></div><div class="bar-label">59</div></div></td>
+              <td class="pts">59</td>
+            </tr>
+
+            <tr data-pos="7">
+              <td class="pos"><span class="pos-badge">7</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#B6BABD;"></span>Haas F1 Team</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:6.3%; background:#B6BABD;"></div><div class="bar-label">21</div></div></td>
+              <td class="pts">21</td>
+            </tr>
+
+            <tr data-pos="8">
+              <td class="pos"><span class="pos-badge">8</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#64C4FF;"></span>Williams</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:3.3%; background:#64C4FF;"></div><div class="bar-label">11</div></div></td>
+              <td class="pts">11</td>
+            </tr>
+
+            <tr data-pos="9">
+              <td class="pos"><span class="pos-badge">9</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#BB0A30;"></span>Audi</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:1.8%; background:#BB0A30;"></div><div class="bar-label">6</div></div></td>
+              <td class="pts">6</td>
+            </tr>
+
+            <tr data-pos="10">
+              <td class="pos"><span class="pos-badge">10</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#229971;"></span>Aston Martin</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:0.3%; background:#229971;"></div><div class="bar-label">1</div></div></td>
+              <td class="pts">1</td>
+            </tr>
+
+            <tr data-pos="11" class="zero">
+              <td class="pos"><span class="pos-badge">11</span></td>
+              <td class="team-cell-wrap"><div class="team-cell"><span class="swatch" style="background:#FFD100;"></span>Cadillac</div></td>
+              <td><div class="bar-track"><div class="bar-fill" style="width:0%; background:#FFD100;"></div><div class="bar-label">0</div></div></td>
+              <td class="pts">0</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="stripe"></div>
+
+  <footer>
+    <p>Formula 1 World — Season Standings</p>
+    <a href="formula1-world.html">← Back to Home</a>
+  </footer>
+
+</body>
+</html>

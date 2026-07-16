@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formula 1 World — Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0b0f;
+    --surface: #16161c;
+    --surface-2: #1e1e26;
+    --line: #2a2a34;
+    --red: #e10600;
+    --yellow: #ffd400;
+    --white: #f5f5f7;
+    --grey: #9497a1;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+
+  h1, h2, .display{
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  a{ color: var(--yellow); }
+  a:focus-visible, button:focus-visible{ outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+  .stripe{
+    height: 6px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--red), var(--red) 18px,
+      var(--yellow) 18px, var(--yellow) 24px
+    );
+  }
+
+  header{
+    text-align: center;
+    padding: 70px 20px 40px;
+    background: radial-gradient(circle at 50% -20%, #22131199, transparent 60%), var(--bg);
+  }
+
+  .eyebrow{
+    font-family: 'Space Mono', monospace;
+    color: var(--red);
+    letter-spacing: 0.35em;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  h1.title{
+    font-size: clamp(2.2rem, 7vw, 4.2rem);
+    font-style: italic;
+    transform: skewX(-4deg);
+    line-height: 0.95;
+  }
+  h1.title span{ color: var(--red); }
+
+  .tagline{
+    font-family: 'Space Mono', monospace;
+    color: var(--grey);
+    font-size: 0.95rem;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  nav{
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-top: 26px;
+  }
+  nav a{
+    color: var(--white);
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+  }
+  nav a:hover{ color: var(--yellow); border-color: var(--red); }
+
+  main{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px 90px;
+  }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 34px;
+  }
+  .section-head .num{
+    font-family: 'Space Mono', monospace;
+    color: var(--red);
+    font-size: 0.9rem;
+  }
+  h2{ font-size: clamp(1.5rem, 3.5vw, 2rem); font-style: italic; }
+
+  /* ---------- Gallery grid ---------- */
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 260px;
+    gap: 16px;
+  }
+
+  .gallery figure{
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    cursor: zoom-in;
+  }
+
+  .gallery img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(10%) contrast(1.05);
+    transition: transform 0.5s ease, filter 0.5s ease;
+  }
+
+  .gallery figure:hover img{
+    transform: scale(1.08);
+    filter: grayscale(0%) contrast(1.1);
+  }
+
+  .gallery figcaption{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 14px 16px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--white);
+    letter-spacing: 0.03em;
+    transform: translateY(8px);
+    opacity: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
+
+  .gallery figure:hover figcaption{
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .tag{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: var(--white);
+    padding: 4px 8px;
+  }
+
+  /* Feature (large) tiles */
+  .feat-wide{ grid-column: span 2; }
+  .feat-tall{ grid-row: span 2; }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox{
+    position: fixed;
+    inset: 0;
+    background: rgba(6,6,8,0.94);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    z-index: 100;
+  }
+  .lightbox.open{ display: flex; }
+  .lightbox img{
+    max-width: 100%;
+    max-height: 82vh;
+    border: 1px solid var(--line);
+  }
+  .lightbox-caption{
+    position: absolute;
+    bottom: 30px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    color: var(--grey);
+    font-size: 0.85rem;
+  }
+  .lightbox-close{
+    position: absolute;
+    top: 24px; right: 30px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  .lightbox-close:hover{ border-color: var(--red); color: var(--yellow); }
+
+  footer{
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+  }
+  footer a{ display: inline-block; margin-top: 10px; }
+
+  @media (max-width: 900px){
+    .gallery{ grid-template-columns: repeat(2, 1fr); grid-auto-rows: 220px; }
+    .feat-wide{ grid-column: span 2; }
+  }
+  @media (max-width: 560px){
+    .gallery{ grid-template-columns: 1fr; grid-auto-rows: 220px; }
+    .feat-wide, .feat-tall{ grid-column: span 1; grid-row: span 1; }
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="stripe"></div>
+
+  <header id="top">
+    <span class="eyebrow">GRAND PRIX EDITION</span>
+    <h1 class="title">PHOTO <span>GALLERY</span></h1>
+    <p class="tagline">— MOMENTS FROM THE GRID —</p>
+    <nav>
+      <a href="formula1-world.html">Home</a>
+      <a href="table.html">Standings</a>
+      <a href="image.html">Gallery</a>
+    </nav>
+  </header>
+
+  <hr style="border: none; border-top: 1px solid var(--line);">
+
+  <main>
+    <section id="gallery">
+      <div class="section-head">
+        <span class="num">01</span>
+        <h2>On Track</h2>
+      </div>
+
+      <div class="gallery">
+
+        <figure class="feat-wide feat-tall" data-full="https://media.formula1.com/image/upload/c_lfill,w_2048/q_auto/v1740000001/fom-website/2026%20regulations/2026_Explainer_FIA_Front_3_4_1920x1080.webp" data-caption="2026 regulations — the next generation F1 car">
+          <span class="tag">2026 Regs</span>
+          <img src="https://media.formula1.com/image/upload/c_lfill,w_2048/q_auto/v1740000001/fom-website/2026%20regulations/2026_Explainer_FIA_Front_3_4_1920x1080.webp" alt="2026 F1 regulation car, front three-quarter view" loading="lazy">
+          <figcaption>2026 regulations — the next generation F1 car</figcaption>
+        </figure>
+
+        <figure data-full="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL_3iFA7ynFKdLY2KRsei1rwAWzTfc8dxfDK5yRCu2JSRrG3NKVCxAXomR&s=10" data-caption="Trackside detail">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL_3iFA7ynFKdLY2KRsei1rwAWzTfc8dxfDK5yRCu2JSRrG3NKVCxAXomR&s=10" alt="Formula 1 trackside detail" loading="lazy">
+          <figcaption>Trackside detail</figcaption>
+        </figure>
+
+        <figure data-full="https://media.formula1.com/image/upload/t_16by9South/c_lfill,w_960,h_540/q_auto/v1740000001/trackside-images/2026/F1_Grand_Prix_Of_Australia/2265353567.webp" data-caption="Australian Grand Prix — trackside action">
+          <span class="tag">Australia GP</span>
+          <img src="https://media.formula1.com/image/upload/t_16by9South/c_lfill,w_960,h_540/q_auto/v1740000001/trackside-images/2026/F1_Grand_Prix_Of_Australia/2265353567.webp" alt="Australian Grand Prix trackside action" loading="lazy">
+          <figcaption>Australian Grand Prix — trackside action</figcaption>
+        </figure>
+
+        <figure class="feat-wide" data-full="https://media.formula1.com/image/upload/t_16by9Centre/c_lfill,w_3392/q_auto/v1740000001/fom-website/2025/Miscellaneous/GettyImages-1228294.webp" data-caption="Grid moments from the 2025 season">
+          <img src="https://media.formula1.com/image/upload/t_16by9Centre/c_lfill,w_3392/q_auto/v1740000001/fom-website/2025/Miscellaneous/GettyImages-1228294.webp" alt="F1 miscellaneous grid moment, 2025 season" loading="lazy">
+          <figcaption>Grid moments from the 2025 season</figcaption>
+        </figure>
+
+        <figure class="feat-tall" data-full="https://cdn.britannica.com/66/258266-050-BD8FC43A/Max-Verstappen-Grand-Prix-of-Singapore.jpg" data-caption="Max Verstappen — Singapore Grand Prix">
+          <span class="tag">Verstappen</span>
+          <img src="https://cdn.britannica.com/66/258266-050-BD8FC43A/Max-Verstappen-Grand-Prix-of-Singapore.jpg" alt="Max Verstappen at the Singapore Grand Prix" loading="lazy">
+          <figcaption>Max Verstappen — Singapore Grand Prix</figcaption>
+        </figure>
+
+        <figure data-full="https://assets.cntraveller.in/photos/67d164d9516e7e0b9716809c/master/w_1600%2Cc_limit/Monaco%2520Grand%2520Prix_GettyImages-2153966297.jpg" data-caption="Monaco Grand Prix — the jewel of the calendar">
+          <span class="tag">Monaco GP</span>
+          <img src="https://assets.cntraveller.in/photos/67d164d9516e7e0b9716809c/master/w_1600%2Cc_limit/Monaco%2520Grand%2520Prix_GettyImages-2153966297.jpg" alt="Monaco Grand Prix street circuit" loading="lazy">
+          <figcaption>Monaco Grand Prix — the jewel of the calendar</figcaption>
+        </figure>
+
+        <figure data-full="https://www.racefans.net/wp-content/uploads/2024/03/racefansdotnet-7172831_HiRes.jpg" data-caption="Race weekend, 2024 season">
+          <img src="https://www.racefans.net/wp-content/uploads/2024/03/racefansdotnet-7172831_HiRes.jpg" alt="Formula 1 race weekend action, 2024 season" loading="lazy">
+          <figcaption>Race weekend, 2024 season</figcaption>
+        </figure>
+
+        <figure class="feat-wide" data-full="https://cdn.honda.racing/production/223172/conversions/2024-F1_rd21_SaoPaulo_0001_R_Max_Verstappen_L-medium.jpg" data-caption="Max Verstappen — São Paulo Grand Prix, Round 21">
+          <span class="tag">São Paulo GP</span>
+          <img src="https://cdn.honda.racing/production/223172/conversions/2024-F1_rd21_SaoPaulo_0001_R_Max_Verstappen_L-medium.jpg" alt="Max Verstappen racing at the Sao Paulo Grand Prix" loading="lazy">
+          <figcaption>Max Verstappen — São Paulo Grand Prix, Round 21</figcaption>
+        </figure>
+
+        <figure data-full="https://cdn-1.motorsport.com/images/amp/2d1QlRDY/s1000/formula-1-emilia-romagna-gp-20-1006067.webp" data-caption="Emilia Romagna Grand Prix">
+          <span class="tag">Emilia Romagna GP</span>
+          <img src="https://cdn-1.motorsport.com/images/amp/2d1QlRDY/s1000/formula-1-emilia-romagna-gp-20-1006067.webp" alt="Emilia Romagna Grand Prix action" loading="lazy">
+          <figcaption>Emilia Romagna Grand Prix</figcaption>
+        </figure>
+
+      </div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕ Close</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <div class="stripe"></div>
+
+  <footer>
+    <p>Formula 1 World — Photo Gallery</p>
+    <a href="formula1-world.html">← Back to Home</a>
+  </footer>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('lightbox-close');
+
+    document.querySelectorAll('.gallery figure').forEach(fig => {
+      fig.addEventListener('click', () => {
+        lightboxImg.src = fig.dataset.full;
+        lightboxImg.alt = fig.dataset.caption || '';
+        lightboxCaption.textContent = fig.dataset.caption || '';
+        lightbox.classList.add('open');
+      });
+    });
+
+    function closeLightbox(){
+      lightbox.classList.remove('open');
+      lightboxImg.src = '';
+    }
+
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  </script>
+
+</body>
+</html>
